@@ -1,0 +1,11 @@
+model_list:
+  - model_name: bot-model
+    litellm_params:
+      # Заменить на реальный ID модели своего провайдера.
+      # openai/ означает OpenAI-compatible транспорт, включая сторонние API.
+      model: openai/REPLACE_WITH_YOUR_MODEL_ID
+      api_key: os.environ/UPSTREAM_API_KEY
+      api_base: os.environ/UPSTREAM_API_BASE
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY

@@ -1,0 +1,24 @@
+[Unit]
+Description=Personal Telegram control bot for LiteLLM
+After=network-online.target admin-console.service
+Wants=network-online.target admin-console.service
+
+[Service]
+Type=simple
+User=root
+Group=root
+EnvironmentFile=/etc/litellm-telegram-bot.env
+ExecStart=/usr/bin/python3 /opt/litellm-telegram-bot/bot.py
+Restart=always
+RestartSec=5
+TimeoutStopSec=40
+MemoryMax=512M
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+LockPersonality=true
+SystemCallArchitectures=native
+StateDirectory=litellm-telegram-bot
+
+[Install]
+WantedBy=multi-user.target

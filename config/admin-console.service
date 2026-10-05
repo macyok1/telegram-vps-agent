@@ -1,0 +1,25 @@
+[Unit]
+Description=Owner-approved independent server console
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/admin-console
+ExecStart=/usr/bin/python3 /opt/admin-console/server_console.py
+Restart=on-failure
+RestartSec=3
+UMask=0077
+RuntimeDirectory=admin-console
+StateDirectory=admin-console
+StateDirectoryMode=0700
+NoNewPrivileges=true
+KillMode=control-group
+TimeoutStopSec=5
+MemoryMax=768M
+TasksMax=256
+
+[Install]
+WantedBy=multi-user.target

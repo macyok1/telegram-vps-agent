@@ -1,0 +1,35 @@
+name: Check shareable bot
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Python compilation and existing tests
+        env:
+          PYTHONPATH: apps:apps/telegram-bot
+        run: |
+          python3 -m compileall -q apps scripts
+          python3 -m unittest discover -s apps/telegram-bot -p 'test_*.py' -v
+          python3 -m unittest discover -s apps/tests -p 'test_*.py' -v
+      - name: Shell syntax
+        run: bash -n scripts/install.sh
+      - name: Compose configuration
+        run: docker compose --env-file gateway/gateway.env.example -f gateway/compose.yml config -q
+      - name: Publication boundary
+        run: python3 scripts/check-publication.py
+      - name: Fresh Linux installation and real command broker
+        run: |
+          sudo bash scripts/install.sh
+          sudo python3 - <<'PY'
+          from pathlib import Path
+          path = Path('/etc/litellm-telegram-bot.env')
+          path.write_text(path.read_text().replace('REPLACE_WITH_YOUR_NUMERIC_USER_ID', '42'))
+          PY
+          sudo systemd-analyze verify config/admin-console.service config/litellm-telegram-bot.service
+          sudo systemctl start admin-console
+          sudo systemctl is-active --quiet admin-console
+          sudo python3 scripts/smoke-installed.py
